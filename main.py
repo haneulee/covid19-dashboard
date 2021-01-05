@@ -2,9 +2,8 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.express as px
-from data import countries_df
 from builders import make_table
-from data import totals_df
+from data import countries_df, totals_df, dropdown_options
 from dash.dependencies import Input, Output
 
 stylesheets = [
@@ -81,22 +80,24 @@ app.layout = html.Div(
                 html.Div(children=[make_table(countries_df)]),
             ],
         ),
-        html.Div(
-            style={
-                "display": "grid",
-                "gap": 50,
-                "gridTemplateColumns": "repeat(4, 1fr)",
-            },
-            children=[
-                html.Div(children=[dcc.Graph(figure=bars_graph),
-                html.Div(
-                    children=[
-                        dcc.Input(placeholder="What is your name?", id="hello-input"),
-                        html.H2(children="Hello Anonymous", id="hello-output")
-                    ]
-                )
-            ]),
-        ])
+        html.Div(style={
+            "display": "grid",
+            "gap": 50,
+            "gridTemplateColumns": "repeat(4, 1fr)",
+        },
+                 children=[
+                     html.Div(children=[
+                         dcc.Graph(figure=bars_graph),
+                         html.Div(children=[
+                             dcc.Dropdown(id="country",
+                                          options=[{
+                                              'label': country,
+                                              'value': country
+                                          } for country in dropdown_options]),
+                        html.H1(id="country-output"),
+                         ])
+                     ]),
+                 ])
     ],
 )
 
@@ -107,14 +108,7 @@ if __name__ == "__main__":
     app.run_server(debug=True)
 
 
-@app.callback(
-    Output("hello-output", "children"),
-    [
-        Input("hello-input", "value")
-    ]
-)
+@app.callback(Output("country-output", "children"),
+              [Input("country", "value")])
 def update_hello(value):
-    if value is None:
-        return "hello"
-    else:
-        return print(value)
+    print(value)
